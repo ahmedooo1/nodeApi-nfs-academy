@@ -2,12 +2,16 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
+
+
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
+            name : req.body.name,
           email: req.body.email,
-          password: hash
+          password: hash,
+          
         });
         user.save()
           .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
@@ -40,3 +44,31 @@ exports.signup = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error }));
  };
+
+
+
+ exports.getUsers = (req, res, next) => {
+    User.find()
+      .then(users => res.status(200).json(users))
+      .catch(error => res.status(400).json({ error }));
+  } 
+  exports.getUser = (req, res, next) => {
+    User.findById(req.params.id)
+      .then(user => res.status(200).json(user))
+      .catch(error => res.status(404).json({ error }));
+  }
+ exports.updateUser = (req, res) => {
+    User.findByIdAndUpdate(req.params.id, req.body, { new: true})
+      .then(user => res.status(200).json(user))
+      .catch(err => res.status(400).json(err));
+  };
+
+
+
+  exports.deleteUser = (req, res, next) => {
+    User.findByIdAndRemove(req.params.id)
+      .then(() => res.status(200).json({ message: 'Utilisateur supprimé !' }))
+      .catch(error => res.status(400).json({ error }));
+  }
+
+

@@ -3,9 +3,14 @@ const app = express();
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const commentRoutes = require('./routes/commentRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 
 const stuffRoutes = require('./routes/stuff');
 const userRoutes = require('./routes/user');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocs = require('./swagger');
+
 
 mongoose.connect('mongodb+srv://hdmStore:hdmStorePass@hdmstore1.vuvmw45.mongodb.net/?retryWrites=true&w=majority',
   { useNewUrlParser: true,
@@ -29,4 +34,11 @@ app.use(bodyParser.json());
  app.use('/api/stuff', stuffRoutes);
 
  app.use('/api/auth', userRoutes);
+
+ app.use('/api', commentRoutes);
+
+ app.use('/api', categoryRoutes);
+
+ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 module.exports= app;

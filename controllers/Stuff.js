@@ -2,13 +2,19 @@ const Thing = require('../models/thing');
 const fs = require('fs');
 
 exports.createThing = (req, res, next) => {
-  const thingObject = JSON.parse(req.body.thing);
+    const thingObject = req.body;
   delete thingObject._id;
   delete thingObject._userId;
+//   if (!req.file) {
+//   return res.status(400).json({ error: 'Vous devez uploader une image !' });
+// }
+  const imageUrl = req.file ?  
+  `${req.protocol}://${req.get('host')}/images/${req.file.filename}` :   
+  '/images/default.jpg';
   const thing = new Thing({
       ...thingObject,
       userId: req.auth.userId,
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+      imageUrl
   });
 
   thing.save()
@@ -26,14 +32,11 @@ exports.modifyThing = (req, res, next) => {
   delete thingObject._userId;
   Thing.findOne({_id: req.params.id})
       .then((thing) => {
-          if (thing.userId != req.auth.userId) {
-              res.status(401).json({ message : 'Not authorized'});
-          } else {
               Thing.updateOne({ _id: req.params.id}, { ...thingObject, _id: req.params.id})
               .then(() => res.status(200).json({message : 'Objet modifié!'}))
               .catch(error => res.status(401).json({ error }));
           }
-      })
+      )
       .catch((error) => {
           res.status(400).json({ error });
       });
