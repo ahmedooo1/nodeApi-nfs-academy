@@ -3,14 +3,18 @@ const Comment = require('../models/comments');
 
 exports.createComment = async (req, res) => {
   try {
-    const { content, postId } = req.body;
-    const userId = req.user.id;
+    const userId = req.auth ? req.auth.userId : null;
+  
 
-    const comment = new Comment({
-      content,
-      postId,
-      user: userId
-    });
+ 
+  const { content, stuffId } = req.body;
+
+
+  const comment = new Comment({
+    content,
+    stuffId,
+    userId: req.auth.userId, // ID de l'utilisateur connecté
+  })
 
     await comment.save();
 
@@ -21,17 +25,17 @@ exports.createComment = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
-      message: "Erreur lors de la création du commentaire",
-      error: error.message
-    });
+        success: false,  
+        message: "Erreur lors de la création du commentaire",
+        error: error
+      });
   }
 };
 
 exports.getComments = async (req, res) => {
   try {
-    const comments = await Comment.find().populate('user', 'username');
-
+    const comments = await Comment.find().populate('user', 'name').populate('userId', 'name');    
+    
     res.status(200).json({
       success: true,
       data: comments
@@ -48,7 +52,7 @@ exports.getComments = async (req, res) => {
 exports.getComment = async (req, res) => {
   try {
     const commentId = req.params.id;
-    const comment = await Comment.findById(commentId).populate('user', 'username');
+    const comment = await Comment.findById(commentId).populate('user', 'name');
 
     if (!comment) {
       return res.status(404).json({

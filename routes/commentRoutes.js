@@ -10,4 +10,5 @@ router.get('/comments/:id', auth, commentController.getComment);
 router.put('/comments/:id', auth, roleCheck('admin'), commentController.updateComment);
 router.delete('/comments/:id', auth, roleCheck('admin'), commentController.deleteComment);
 
+
 module.exports = router;

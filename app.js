@@ -10,9 +10,9 @@ const stuffRoutes = require('./routes/stuff');
 const userRoutes = require('./routes/user');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./swagger');
+require('dotenv').config();
 
-
-mongoose.connect('mongodb+srv://hdmStore:hdmStorePass@hdmstore1.vuvmw45.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect(process.env.MONGODB_URI,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))

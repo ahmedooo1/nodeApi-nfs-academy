@@ -12,6 +12,22 @@ const swaggerOptions = {
         email: 'aahmadooo997@gmail.com',
       },
     },
+    components: {
+      securitySchemes: {
+        Bearer: {
+          type: 'apiKey',
+          name: 'Authorization',
+          in: 'header',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        Bearer: [],
+      },
+    ],
     servers: [
       {
         url: 'http://localhost:3000',

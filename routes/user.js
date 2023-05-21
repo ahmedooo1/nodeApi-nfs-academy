@@ -69,16 +69,83 @@ router.post('/signup', userCtrl.signup);
  */
 router.post('/login', userCtrl.login);
 
+/**
+ * @swagger
+ * /api/auth:
+ *   get:
+ *     summary: Récupère la liste de tous les utilisateurs
+ *     description: Route pour obtenir la liste de tous les utilisateurs. Nécessite une authentification.
+ *     responses:
+ *       200:
+ *         description: Une liste d'utilisateurs
+ */
+router.get('/', auth, userCtrl.getUsers);
 
-
-router.get('/',auth, userCtrl.getUsers);
-
+/**
+ * @swagger
+ * /api/auth/{id}:
+ *   get:
+ *     summary: Récupère un utilisateur par son ID
+ *     description: Route pour obtenir un utilisateur avec un ID spécifique. Nécessite une authentification.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: L'utilisateur avec l'ID spécifié
+ */
 router.get('/:id', auth, userCtrl.getUser);
 
-router.put('/:id',auth, roleCheck(['admin']), userCtrl.updateUser);
+/**
+ * @swagger
+ * /api/auth/{id}:
+ *   put:
+ *     summary: Met à jour un utilisateur par son ID
+ *     description: Route pour mettre à jour un utilisateur avec un ID spécifique. Nécessite une authentification et le rôle 'admin'.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: L'utilisateur mis à jour
+ */
+router.put('/:id', auth, roleCheck(['admin']), userCtrl.updateUser);
 
-router.delete('/:id',auth, roleCheck(['admin']), userCtrl.deleteUser);
-
-
+/**
+ * @swagger
+ * /api/auth/{id}:
+ *   delete:
+ *     summary: Supprime un utilisateur par son ID
+ *     description: Route pour supprimer un utilisateur avec un ID spécifique. Nécessite une authentification et le rôle 'admin'.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: L'utilisateur supprimé
+ */
+router.delete('/:id', auth, roleCheck(['admin']), userCtrl.deleteUser);
 
 module.exports = router;
