@@ -8,9 +8,10 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/stuff:
+ * /stuff:
  *   post:
  *     summary: Crée un nouvel objet
+ *     tags: [Stuff]
  *     description: Route pour créer un nouvel objet. Nécessite une authentification et les rôles 'admin' ou 'rédacteur'.
  *     requestBody:
  *       required: true
@@ -36,9 +37,10 @@ router.post('/', auth, roleCheck(['admin', 'redacteur']), multer, stuffCtrl.crea
 
 /**
  * @swagger
- * /api/stuff/{id}:
+ * /stuff/{id}:
  *   get:
  *     summary: Récupère un objet par son ID
+ *     tags: [Stuff]
  *     description: Route pour récupérer un objet avec un ID spécifique. Nécessite une authentification.
  *     parameters:
  *       - in: path
@@ -54,9 +56,10 @@ router.get('/:id', auth, stuffCtrl.getOneThing);
 
 /**
  * @swagger
- * /api/stuff/{id}:
+ * /stuff/{id}:
  *   put:
  *     summary: Met à jour un objet par son ID
+ *     tags: [Stuff]
  *     description: Route pour mettre à jour un objet avec un ID spécifique. Nécessite une authentification et le rôle 'admin'.
  *     parameters:
  *       - in: path
@@ -88,9 +91,10 @@ router.put('/:id', auth, roleCheck(['admin']), multer, stuffCtrl.modifyThing);
 
 /**
  * @swagger
- * /api/stuff/{id}:
+ * /stuff/{id}:
  *   delete:
  *     summary: Supprime un objet par son ID
+ *     tags: [Stuff]
  *     description: Route pour supprimer un objet avec un ID spécifique. Nécessite une authentification.
  *     parameters:
  *       - in: path
@@ -106,9 +110,10 @@ router.delete('/:id', auth, stuffCtrl.deleteThing);
 
 /**
  * @swagger
- * /api/stuff:
+ * /stuff:
  *   get:
  *     summary: Récupère la liste de tous les objets
+ *     tags: [Stuff]
  *     description: Route pour récupérer la liste de tous les objets
  *     responses:
  *       200:

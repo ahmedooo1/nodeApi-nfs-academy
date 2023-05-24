@@ -46,6 +46,98 @@ exports.getCategories = async (req, res) => {
   }
 };
 
+exports.getCategoryById = async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+  
+      const category = await Category.findById(categoryId).populate('subcategories');
+  
+      if (!category) {
+        return res.status(404).json({
+          success: false,
+          message: "Catégorie introuvable",
+        });
+      }
+  
+      res.status(200).json({
+        success: true,
+        data: category,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Erreur lors de la récupération de la catégorie",
+        error: error.message,
+      });
+    }
+  };
+
+exports.updateCategory = async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+      const { name } = req.body;
+  
+      if (!name) {
+        return res.status(400).json({
+          success: false,
+          message: "Le nom de la catégorie est requis",
+        });
+      }
+  
+      const updatedCategory = await Category.findByIdAndUpdate(
+        categoryId,
+        { name },
+        { new: true }
+      );
+  
+      if (!updatedCategory) {
+        return res.status(404).json({
+          success: false,
+          message: "Catégorie introuvable",
+        });
+      }
+  
+      res.status(200).json({
+        success: true,
+        message: "Catégorie mise à jour avec succès",
+        data: updatedCategory,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Erreur lors de la mise à jour de la catégorie",
+        error: error.message,
+      });
+    }
+  };
+  
+  exports.deleteCategory = async (req, res) => {
+    try {
+      const { categoryId } = req.params;
+  
+      const deletedCategory = await Category.findByIdAndDelete(categoryId);
+  
+      if (!deletedCategory) {
+        return res.status(404).json({
+          success: false,
+          message: "Catégorie introuvable",
+        });
+      }
+  
+      res.status(200).json({
+        success: true,
+        message: "Catégorie supprimée avec succès",
+        data: deletedCategory,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Erreur lors de la suppression de la catégorie",
+        error: error.message,
+      });
+    }
+  };
+
 /*----------sous categories------------*/
 
 exports.createSubCategory = async (req, res) => {
