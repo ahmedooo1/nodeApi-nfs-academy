@@ -9,7 +9,7 @@ require('dotenv').config();
 const stuffRoutes = require('./routes/stuff');
 const userRoutes = require('./routes/user');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocs = require('./swagger');
+const swaggerDocs = require('./config/swagger');
 const stripeRoute = require('./routes/stripe');
 const contactRoutes = require('./routes/contactRoutes');
 
