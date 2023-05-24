@@ -3,12 +3,14 @@ const router = express.Router();
 const userCtrl = require('../controllers/user');
 const roleCheck = require('../middleware/roleCheck');
 const auth = require('../middleware/auth');
+const resetmdp = require('../controllers/sendResetPasswordEmail')
 
 /**
  * @swagger
- * /api/auth/signup:
+ * /auth/signup:
  *   post:
  *     summary: Crée un nouvel utilisateur
+ *     tags: [LogIn/SignUp]
  *     description: Crée un nouvel utilisateur avec les informations fournies
  *     requestBody:
  *       required: true
@@ -36,9 +38,10 @@ router.post('/signup', userCtrl.signup);
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Authentifie un utilisateur
+ *     tags: [LogIn/SignUp]
  *     description: Authentifie un utilisateur avec l'adresse e-mail et le mot de passe fournis
  *     requestBody:
  *       required: true
@@ -71,9 +74,10 @@ router.post('/login', userCtrl.login);
 
 /**
  * @swagger
- * /api/auth:
+ * /auth:
  *   get:
  *     summary: Récupère la liste de tous les utilisateurs
+ *     tags: [Users]
  *     description: Route pour obtenir la liste de tous les utilisateurs. Nécessite une authentification.
  *     responses:
  *       200:
@@ -83,9 +87,10 @@ router.get('/', auth, userCtrl.getUsers);
 
 /**
  * @swagger
- * /api/auth/{id}:
+ * /auth/{id}:
  *   get:
  *     summary: Récupère un utilisateur par son ID
+ *     tags: [Users]
  *     description: Route pour obtenir un utilisateur avec un ID spécifique. Nécessite une authentification.
  *     parameters:
  *       - in: path
@@ -101,9 +106,10 @@ router.get('/:id', auth, userCtrl.getUser);
 
 /**
  * @swagger
- * /api/auth/{id}:
+ * /auth/{id}:
  *   put:
  *     summary: Met à jour un utilisateur par son ID
+ *     tags: [Users]
  *     description: Route pour mettre à jour un utilisateur avec un ID spécifique. Nécessite une authentification et le rôle 'admin'.
  *     parameters:
  *       - in: path
@@ -132,9 +138,10 @@ router.put('/:id', auth, roleCheck(['admin']), userCtrl.updateUser);
 
 /**
  * @swagger
- * /api/auth/{id}:
+ * /auth/{id}:
  *   delete:
  *     summary: Supprime un utilisateur par son ID
+ *     tags: [Users]
  *     description: Route pour supprimer un utilisateur avec un ID spécifique. Nécessite une authentification et le rôle 'admin'.
  *     parameters:
  *       - in: path
@@ -147,5 +154,78 @@ router.put('/:id', auth, roleCheck(['admin']), userCtrl.updateUser);
  *         description: L'utilisateur supprimé
  */
 router.delete('/:id', auth, roleCheck(['admin']), userCtrl.deleteUser);
+
+//reinitialiser le mdp
+
+/**
+ * @swagger
+ * /auth/mdpOublie:
+ *   post:
+ *     summary: Envoyer un e-mail de réinitialisation de mot de passe
+ *     tags: [Mot de pass oublié et la réinitialisation]
+ *     description: Envoyer un e-mail contenant un lien de réinitialisation de mot de passe à l'utilisateur
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: L'email de l'utilisateur
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Un e-mail de réinitialisation de mot de passe a été envoyé
+ */
+router.post("/mdpOublie", resetmdp.sendResetPasswordEmail);
+
+/**
+ * @swagger
+ * /auth/reset/{token}:
+ *   get:
+ *     summary: Vérifier le jeton de réinitialisation de mot de passe
+ *     tags: [Mot de pass oublié et la réinitialisation]
+ *     description: Vérifier si le jeton de réinitialisation de mot de passe est valide
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Le jeton de réinitialisation de mot de passe est valide
+ */
+router.get("/reset/:token", resetmdp.verifyPasswordResetToken);
+
+/**
+ * @swagger
+ * /auth/reset/{token}:
+ *   post:
+ *     summary: Mettre à jour le mot de passe de l'utilisateur
+ *     tags: [Mot de pass oublié et la réinitialisation]
+ *     description: Utiliser un jeton de réinitialisation de mot de passe valide pour mettre à jour le mot de passe de l'utilisateur
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newPassword:
+ *                 type: string
+ *                 description: Le nouveau mot de passe de l'utilisateur
+ *                 example: new_password123
+ *     responses:
+ *       200:
+ *         description: Le mot de passe a été mis à jour avec succès
+ */
+router.post("/reset/:token", resetmdp.updatePassword);
 
 module.exports = router;
