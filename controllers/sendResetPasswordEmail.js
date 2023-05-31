@@ -36,7 +36,7 @@ exports.sendResetPasswordEmail = async (req, res) => {
     res.status(200).json({ message: "E-mail de réinitialisation envoyé" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de l'envoi de l'e-mail de réinitialisation" });
+    res.status(500).json({ message: "Erreur lors de l'envoi de l'e-mail de réinitialisation",error: error.message });
   }
 };
 

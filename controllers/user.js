@@ -35,7 +35,7 @@ exports.signup = (req, res, next) => {
                         userId: user._id,
                         token: jwt.sign(
                             { userId: user._id },
-                            'RANDOM_TOKEN_SECRET',
+                            process.env.JWT_SECRET,
                             { expiresIn: '24h' }
                         )
                     });
@@ -71,4 +71,19 @@ exports.signup = (req, res, next) => {
       .catch(error => res.status(400).json({ error }));
   }
 
-
+  exports.searchUsers = (req, res) => {
+    const searchTerm = req.body.searchTerm;
+    const role = req.body.role;
+    
+    User.find({ 
+      $or: [
+        { $or: [
+          { name: { $regex: searchTerm, $options: 'i' } },
+          { email: { $regex: searchTerm, $options: 'i' } } 
+        ] },
+        { role: role }
+      ] 
+    })
+    .then(users => res.status(200).json(users))
+    .catch(err => res.status(400).json(err)); 
+  };

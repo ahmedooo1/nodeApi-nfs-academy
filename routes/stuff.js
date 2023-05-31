@@ -1,18 +1,26 @@
 const express = require('express');
 const auth = require('../middleware/auth');
 const stuffCtrl = require('../controllers/Stuff');
-const multer = require('../middleware/multer-config');
+const multer = require('../config/multer-config');
 const roleCheck = require('../middleware/roleCheck');
 
 const router = express.Router();
 
 /**
  * @swagger
- * /stuff:
- *   post:
- *     summary: Crée un nouvel objet
+ * /stuff/{id}:
+ *   put:
+ *     summary: Met à jour un objet par son ID
  *     tags: [Stuff]
- *     description: Route pour créer un nouvel objet. Nécessite une authentification et les rôles 'admin' ou 'rédacteur'.
+ *     description: Route pour mettre à jour un objet avec un ID spécifique. Nécessite une authentification et le rôle 'admin'.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     consumes:
+ *       - multipart/form-data
  *     requestBody:
  *       required: true
  *       content:
@@ -24,14 +32,14 @@ const router = express.Router();
  *                 type: string
  *               description:
  *                 type: string
- *               imageUrl:
+ *               image:
  *                 type: string
  *                 format: binary
  *               price:
  *                 type: number
  *     responses:
  *       200:
- *         description: L'objet créé
+ *         description: L'objet mis à jour
  */
 router.post('/', auth, roleCheck(['admin', 'redacteur']), multer, stuffCtrl.createThing);
 
@@ -78,7 +86,7 @@ router.get('/:id', auth, stuffCtrl.getOneThing);
  *                 type: string
  *               description:
  *                 type: string
- *               imageUrl:
+ *               image:
  *                 type: string
  *                 format: binary
  *               price:
@@ -87,7 +95,7 @@ router.get('/:id', auth, stuffCtrl.getOneThing);
  *       200:
  *         description: L'objet mis à jour
  */
-router.put('/:id', auth, roleCheck(['admin']), multer, stuffCtrl.modifyThing);
+router.put('/:id', auth, roleCheck(['admin', 'redacteur']), multer, stuffCtrl.modifyThing);
 
 /**
  * @swagger
@@ -106,7 +114,7 @@ router.put('/:id', auth, roleCheck(['admin']), multer, stuffCtrl.modifyThing);
  *       200:
  *         description: L'objet supprimé
  */
-router.delete('/:id', auth, stuffCtrl.deleteThing);
+router.delete('/:id', auth,roleCheck(['admin', 'redacteur']), stuffCtrl.deleteThing);
 
 /**
  * @swagger

@@ -7,7 +7,7 @@ exports.charge = async (req, res) => {
   try {
     const charge = await stripe.charges.create({
       amount: amount,
-      currency: 'usd',
+      currency: 'euro',
       description: 'Frais de service',
       source: token,
     });
