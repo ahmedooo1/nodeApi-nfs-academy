@@ -13,7 +13,8 @@ const swaggerDocs = require('./config/swagger');
 const stripeRoute = require('./routes/stripe');
 const contactRoutes = require('./routes/contactRoutes');
 const cors = require('cors')
-
+const cron = require("node-cron");
+const backupDatabase = require("./config/backup");
 mongoose.connect(process.env.MONGODB_URI,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -32,4 +33,12 @@ app.use('/api/v1', categoryRoutes);
 app.use('/api/v1', contactRoutes);
 app.use('/api/v1', stripeRoute);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
+// Schedule a daily backup at 00:00 (minuit)
+cron.schedule("* 00 * * *", () => {
+  console.log("Running daily backup...");
+  backupDatabase();
+});
+
 module.exports = app;
