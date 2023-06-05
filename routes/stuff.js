@@ -30,6 +30,8 @@ const router = express.Router();
  *             properties:
  *               title:
  *                 type: string
+ *               category:
+ *                 type: string
  *               description:
  *                 type: string
  *               image:
