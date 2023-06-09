@@ -1,6 +1,6 @@
 const express = require('express');
 const auth = require('../middleware/auth');
-const stuffCtrl = require('../controllers/Stuff');
+const guidesCtrl = require('../controllers/guides');
 const multer = require('../config/multer-config');
 const roleCheck = require('../middleware/roleCheck');
 
@@ -40,7 +40,7 @@ const router = express.Router();
  *       201:
  *         description: L'objet créé
  */
-router.post('/', auth, roleCheck(['admin', 'redacteur']), multer, stuffCtrl.createThing);
+router.post('/', auth, roleCheck(['admin', 'redacteur']), multer, guidesCtrl.createThing);
 
 /**
  * @swagger
@@ -59,7 +59,7 @@ router.post('/', auth, roleCheck(['admin', 'redacteur']), multer, stuffCtrl.crea
  *       200:
  *         description: L'objet avec l'ID spécifié
  */
-router.get('/:id', auth, stuffCtrl.getOneThing);
+router.get('/:id', auth, guidesCtrl.getOneThing);
 
 /**
  * @swagger
@@ -97,7 +97,7 @@ router.get('/:id', auth, stuffCtrl.getOneThing);
  *       200:
  *         description: L'objet mis à jour
  */
-router.put('/:id', auth, roleCheck(['admin', 'redacteur']), multer, stuffCtrl.modifyThing);
+router.put('/:id', auth, roleCheck(['admin', 'redacteur']), multer, guidesCtrl.modifyThing);
 
 /**
  * @swagger
@@ -116,7 +116,7 @@ router.put('/:id', auth, roleCheck(['admin', 'redacteur']), multer, stuffCtrl.mo
  *       200:
  *         description: L'objet supprimé
  */
-router.delete('/:id', auth,roleCheck(['admin', 'redacteur']), stuffCtrl.deleteThing);
+router.delete('/:id', auth,roleCheck(['admin', 'redacteur']), guidesCtrl.deleteThing);
 
 /**
  * @swagger
@@ -129,6 +129,6 @@ router.delete('/:id', auth,roleCheck(['admin', 'redacteur']), stuffCtrl.deleteTh
  *       200:
  *         description: Une liste d'objets
  */
-router.get('/', stuffCtrl.getThings);
+router.get('/', guidesCtrl.getThings);
 
 module.exports = router;

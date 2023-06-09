@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const commentRoutes = require('./routes/commentRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 require('dotenv').config();
-const stuffRoutes = require('./routes/stuff');
+const stuffRoutes = require('./routes/guides');
 const userRoutes = require('./routes/user');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./config/swagger');

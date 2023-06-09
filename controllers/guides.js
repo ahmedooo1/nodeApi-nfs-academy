@@ -1,4 +1,4 @@
-const Thing = require('../models/Thing');
+const Thing = require('../models/guides');
 const fs = require('fs');
 const uploadImage = require('../utils/uploadImage');
 const cloudinary = require('../config/cloudinary-config');
