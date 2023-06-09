@@ -27,31 +27,31 @@ const auth = require('../middleware/auth');
  */
 router.post('/categories',auth,roleCheck(['admin']), categoryController.createCategory);
 
-/**
- * @swagger
- * /subcategories:
- *   post:
- *     summary: Créer une sous-catégorie. Nécessite une authentification et le rôle 'admin'.
- *     tags: [Catégories]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             properties:
- *               name:
- *                 type: string
- *                 description: Le nom de la sous-catégorie
- *               categoryId:
- *                 type: string
- *                 description: L'ID de la catégorie parente
- *     responses:
- *       201:
- *         description: Sous-catégorie créée avec succès
- *       400:
- *         description: Requête invalide
- */
-router.post('/subcategories',auth,roleCheck(['admin']), categoryController.createSubCategory);
+// /**
+//  * @swagger
+//  * /subcategories:
+//  *   post:
+//  *     summary: Créer une sous-catégorie. Nécessite une authentification et le rôle 'admin'.
+//  *     tags: [Catégories]
+//  *     requestBody:
+//  *       required: true
+//  *       content:
+//  *         application/json:
+//  *           schema:
+//  *             properties:
+//  *               name:
+//  *                 type: string
+//  *                 description: Le nom de la sous-catégorie
+//  *               categoryId:
+//  *                 type: string
+//  *                 description: L'ID de la catégorie parente
+//  *     responses:
+//  *       201:
+//  *         description: Sous-catégorie créée avec succès
+//  *       400:
+//  *         description: Requête invalide
+//  */
+// router.post('/subcategories',auth,roleCheck(['admin']), categoryController.createSubCategory);
 
 /**
  * @swagger
@@ -147,18 +147,18 @@ router.put('/categories/:categoryId',auth,roleCheck(['admin']), categoryControll
  */
 router.delete('/categories/:categoryId',auth,roleCheck(['admin']), categoryController.deleteCategory);
 
-/**
- * @swagger
- * /subcategories:
- *   get:
- *     summary: Récupérer la liste des sous-catégories
- *     tags: [Catégories]
- *     responses:
- *       200:
- *         description: Liste des sous-catégories récupérée avec succès
- *       400:
- *         description: Requête invalide
- */
-router.get('/subcategories', categoryController.getSubCategories);
+// /**
+//  * @swagger
+//  * /subcategories:
+//  *   get:
+//  *     summary: Récupérer la liste des sous-catégories
+//  *     tags: [Catégories]
+//  *     responses:
+//  *       200:
+//  *         description: Liste des sous-catégories récupérée avec succès
+//  *       400:
+//  *         description: Requête invalide
+//  */
+// router.get('/subcategories', categoryController.getSubCategories);
 
 module.exports = router;

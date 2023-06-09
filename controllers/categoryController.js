@@ -1,41 +1,76 @@
 const Category = require('../models/Category');
-const SubCategory = require('../models/SubCategory');
 
+// Create a category or subcategory
 exports.createCategory = async (req, res) => {
-    try {
-      const { name } = req.body;
-  
-      if (!name) {
-        return res.status(400).json({
-          success: false,
-          message: "Le nom de la catégorie est requis",
-        });
-      }
-  
-      const category = new Category({ name });
-      await category.save();
-  
-      res.status(201).json({
-        success: true,
-        message: "Catégorie créée avec succès",
-        data: category,
-      });
-    } catch (error) {
-      res.status(500).json({
+  try {
+    const { name, parentCategory } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
         success: false,
-        message: "Erreur lors de la création de la catégorie",
-        error: error.message,
+        message: "Le nom de la catégorie est requis",
       });
     }
-  };
 
+    const existingCategory = await Category.findOne({ name });
+    if (existingCategory) {
+      return res.status(400).json({
+        success: false,
+        message: "Catégorie existante",
+      });
+    }
 
+    const category = new Category({
+      name,
+      parentCategory,
+    });
+    await category.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Catégorie créée avec succès",
+      data: category,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error,
+    });
+  }
+};
+
+// Get all categories
 exports.getCategories = async (req, res) => {
   try {
-    const categories = await Category.find().populate('subcategories');
+    const categoriesWithSubcategories = await Category.aggregate([
+      // Match only parent categories (i.e., where parentCategory is null)
+      { $match: { parentCategory: { $eq: null } } },
+      // Perform a left outer join to include subcategories
+      {
+        $lookup: {
+          from: 'categories',
+          localField: '_id',
+          foreignField: 'parentCategory',
+          as: 'subcategories',
+        },
+      },
+      // Project the desired fields (i.e., filter out unnecessary fields)
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          subcategories: {
+            _id: 1,
+            name: 1,
+          },
+        },
+      },
+    ]);
+
     res.status(200).json({
       success: true,
-      data: categories,
+      data: categoriesWithSubcategories,
     });
   } catch (error) {
     res.status(500).json({
@@ -45,154 +80,107 @@ exports.getCategories = async (req, res) => {
     });
   }
 };
-
+// Get a category by ID (including its subcategories)
 exports.getCategoryById = async (req, res) => {
-    try {
-      const { categoryId } = req.params;
-  
-      const category = await Category.findById(categoryId).populate('subcategories');
-  
-      if (!category) {
-        return res.status(404).json({
-          success: false,
-          message: "Catégorie introuvable",
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        data: category,
+  try {
+    const { categoryId } = req.params;
+
+    const category = await Category.findById(categoryId)
+      .populate({
+        path: 'subcategories',
+        model: 'Category',
+        populate: {
+          path: 'parentCategory',
+          model: 'Category',
+        },
       });
-    } catch (error) {
-      res.status(500).json({
+
+    if (!category) {
+      return res.status(404).json({
         success: false,
-        message: "Erreur lors de la récupération de la catégorie",
-        error: error.message,
+        message: "Catégorie introuvable",
       });
     }
-  };
 
+    res.status(200).json({
+      success: true,
+      data: category,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération de la catégorie",
+      error: error.message,
+    });
+  }
+};
+
+// Update a category
 exports.updateCategory = async (req, res) => {
-    try {
-      const { categoryId } = req.params;
-      const { name } = req.body;
-  
-      if (!name) {
-        return res.status(400).json({
-          success: false,
-          message: "Le nom de la catégorie est requis",
-        });
-      }
-  
-      const updatedCategory = await Category.findByIdAndUpdate(
-        categoryId,
-        { name },
-        { new: true }
-      );
-  
-      if (!updatedCategory) {
-        return res.status(404).json({
-          success: false,
-          message: "Catégorie introuvable",
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        message: "Catégorie mise à jour avec succès",
-        data: updatedCategory,
-      });
-    } catch (error) {
-      res.status(500).json({
+  try {
+    const { categoryId } = req.params;
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
         success: false,
-        message: "Erreur lors de la mise à jour de la catégorie",
-        error: error.message,
+        message: "Le nom de la catégorie est requis",
       });
     }
-  };
-  
-  exports.deleteCategory = async (req, res) => {
-    try {
-      const { categoryId } = req.params;
-  
-      const deletedCategory = await Category.findByIdAndDelete(categoryId);
-  
-      if (!deletedCategory) {
-        return res.status(404).json({
-          success: false,
-          message: "Catégorie introuvable",
-        });
-      }
-  
-      res.status(200).json({
-        success: true,
-        message: "Catégorie supprimée avec succès",
-        data: deletedCategory,
-      });
-    } catch (error) {
-      res.status(500).json({
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      categoryId,
+      { name },
+      { new: true }
+    );
+
+    if (!updatedCategory) {
+      return res.status(404).json({
         success: false,
-        message: "Erreur lors de la suppression de la catégorie",
-        error: error.message,
+        message: "Catégorie introuvable",
       });
     }
-  };
 
-/*----------sous categories------------*/
+    res.status(200).json({
+      success: true,
+      message: "Catégorie mise à jour avec succès",
+      data: updatedCategory,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la mise à jour de la catégorie",
+      error: error.message,
+    });
+  }
+};
 
-exports.createSubCategory = async (req, res) => {
-    try {
-      const { parentCategoryId, name } = req.body;
-  
-      if (!parentCategoryId || !name) {
-        return res.status(400).json({
-          success: false,
-          message: "L'ID de la catégorie parente et le nom de la sous-catégorie sont requis",
-        });
-      }
-  
-      const parentCategory = await Category.findById(parentCategoryId);
-  
-      if (!parentCategory) {
-        return res.status(404).json({
-          success: false,
-          message: "Catégorie parente introuvable",
-        });
-      }
-  
-      const subCategory = new SubCategory({ name, parentCategory: parentCategoryId });
-      await subCategory.save();
-  
-      parentCategory.subcategories.push(subCategory);
-      await parentCategory.save();
-  
-      res.status(201).json({
-        success: true,
-        message: "Sous-catégorie créée avec succès",
-        data: subCategory,
-      });
-    } catch (error) {
-      res.status(500).json({
+// Delete a category
+exports.deleteCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({
         success: false,
-        message: "Erreur lors de la création de la sous-catégorie",
-        error: error.message,
+        message: "Catégorie introuvable",
       });
     }
-  };
 
+    // Delete the category
+    await Category.findByIdAndDelete(categoryId);
 
-  exports.getSubCategories = async (req, res) => {
-    try {
-      const subcategories = await SubCategory.find().populate('parentCategory');
-      res.status(200).json({
-        success: true,
-        data: subcategories,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Erreur lors de la récupération des sous-catégories',
-        error: error.message,
-      });
-    }
-  };
+    res.status(200).json({
+      success: true,
+      message: "Catégorie supprimée avec succès",
+      data: category,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la suppression de la catégorie",
+      error: error.message,
+    });
+  }
+};

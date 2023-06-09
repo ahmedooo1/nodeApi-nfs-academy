@@ -7,12 +7,15 @@ const CategorySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  subcategories: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'SubCategory',
-    },
-  ],
+  parentCategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category'  
+  } 
 });
 
+CategorySchema.virtual('subcategories', {
+  ref: 'Category', 
+  localField: '_id',
+  foreignField: 'parentCategory' 
+});
 module.exports = mongoose.model('Category', CategorySchema);

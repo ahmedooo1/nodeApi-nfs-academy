@@ -8,17 +8,11 @@ const router = express.Router();
 
 /**
  * @swagger
- * /stuff/{id}:
- *   put:
- *     summary: Met à jour un objet par son ID
+ * /stuff:
+ *   post:
+ *     summary: Crée un nouvel objet
  *     tags: [Stuff]
- *     description: Route pour mettre à jour un objet avec un ID spécifique. Nécessite une authentification et le rôle 'admin'.
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
+ *     description: Route pour créer un nouvel objet. Nécessite une authentification et les rôles 'admin' ou 'redacteur'.
  *     consumes:
  *       - multipart/form-data
  *     requestBody:
@@ -37,11 +31,14 @@ const router = express.Router();
  *               image:
  *                 type: string
  *                 format: binary
+ *               categoryId:
+ *                 type: string
+ *                 description: "L'ID d'une catégorie existante dans la base de données. Les catégories sont représentées par des étoiles : * pour les catégories principales, ** pour les sous-catégories."
  *               price:
  *                 type: number
  *     responses:
- *       200:
- *         description: L'objet mis à jour
+ *       201:
+ *         description: L'objet créé
  */
 router.post('/', auth, roleCheck(['admin', 'redacteur']), multer, stuffCtrl.createThing);
 
@@ -91,6 +88,9 @@ router.get('/:id', auth, stuffCtrl.getOneThing);
  *               image:
  *                 type: string
  *                 format: binary
+ *               categoryId:
+ *                 type: string
+ *                 description: "L'ID d'une catégorie existante dans la base de données. Les catégories sont représentées par des étoiles : * pour les catégories principales, ** pour les sous-catégories."
  *               price:
  *                 type: number
  *     responses:
