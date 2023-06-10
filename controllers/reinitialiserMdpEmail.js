@@ -1,5 +1,5 @@
 const crypto = require("crypto")
-const User = require("../models/user");
+const User = require("../models/utilisateur");
 const transporter = require("../config/mailer");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const userCtrl = require('../controllers/user');
+const userCtrl = require('../controllers/utilisateurs');
 const roleCheck = require('../middleware/roleCheck');
 const auth = require('../middleware/auth');
-const resetmdp = require('../controllers/sendResetPasswordEmail')
+const resetmdp = require('../controllers/reinitialiserMdpEmail')
 
 /**
  * @swagger

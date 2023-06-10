@@ -2,7 +2,7 @@ const Thing = require('../models/guides');
 const fs = require('fs');
 const uploadImage = require('../utils/uploadImage');
 const cloudinary = require('../config/cloudinary-config');
-const Category = require('../models/Category');
+const Category = require('../models/categorie');
 // const SubCategory = require('../models/SubCategory');
 exports.createThing = async (req, res, next) => {
     const thingObject = req.body;
