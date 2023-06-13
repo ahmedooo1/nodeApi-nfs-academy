@@ -36,7 +36,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 // Schedule a daily backup at 00:00 (minuit)
-cron.schedule("* 00 * * *", () => {
+cron.schedule("00 00 * * *", () => {
   console.log("Running daily backup...");
   backupDatabase();
 });

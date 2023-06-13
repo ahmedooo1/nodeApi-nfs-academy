@@ -73,21 +73,21 @@ exports.deleteUser = (req, res, next) => {
         .then(() => res.status(200).json({ message: 'Utilisateur supprimé !' }))
         .catch(error => res.status(400).json({ error }));
 }
-
 exports.searchUsers = (req, res) => {
     const searchTerm = req.body.searchTerm;
     const role = req.body.role;
-
+  
     User.find({
-            $or: [{
-                    $or: [
-                        { name: { $regex: searchTerm, $options: 'i' } },
-                        { email: { $regex: searchTerm, $options: 'i' } }
-                    ]
-                },
-                { role: role }
-            ]
-        })
-        .then(users => res.status(200).json(users))
-        .catch(err => res.status(400).json(err));
-};
+      $and: [
+        {
+          $or: [
+            { name: { $eq: searchTerm } },
+            { email: { $eq: searchTerm } },
+          ],
+        },
+        { role: role },
+      ],
+    })
+      .then((users) => res.status(200).json(users))
+      .catch((err) => res.status(400).json(err));
+  };
