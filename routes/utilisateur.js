@@ -134,7 +134,7 @@ router.get('/:id', auth, userCtrl.getUser);
  *       200:
  *         description: L'utilisateur mis à jour
  */
-router.put('/:id', auth, roleCheck(['admin']), userCtrl.updateUser);
+router.put('/:id', auth, userCtrl.updateUser);
 
 /**
  * @swagger
