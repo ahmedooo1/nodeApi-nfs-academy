@@ -48,7 +48,7 @@ router.post('/', auth, roleCheck(['admin', 'redacteur']), multer, guidesCtrl.cre
  *   get:
  *     summary: Récupère un objet par son ID
  *     tags: [Guides]
- *     description: Route pour récupérer un objet avec un ID spécifique. Nécessite une authentification.
+ *     description: Route pour récupérer un objet avec un ID spécifique.
  *     parameters:
  *       - in: path
  *         name: id
@@ -59,7 +59,7 @@ router.post('/', auth, roleCheck(['admin', 'redacteur']), multer, guidesCtrl.cre
  *       200:
  *         description: L'objet avec l'ID spécifié
  */
-router.get('/:id', auth, guidesCtrl.getOneThing);
+router.get('/:id', guidesCtrl.getOneThing);
 
 /**
  * @swagger

@@ -3,37 +3,54 @@ const fs = require('fs');
 const uploadImage = require('../utils/uploadImage');
 const cloudinary = require('../config/cloudinary-config');
 const Category = require('../models/categorie');
-// const SubCategory = require('../models/SubCategory');
+const Subcategory = require('../models/Subcategory');
 exports.createThing = async (req, res, next) => {
     const thingObject = req.body;
+    const categoryId = req.body.category;
+
     delete thingObject._id;
     delete thingObject._userId;
+
   
     let imageUrl;
   
     if (req.file) {
       imageUrl = await uploadImage(req.file);
       if (!imageUrl) {
-        return res.status(400).json({ error: 'Erreur lors de l\'upload de l\'image !' });
+        return res.status(400).json({ error: 'Erreur lors de l\'upload de l\'image !'});
       }
     } else {
       imageUrl = '/images/default.jpg';
     }
-  
+    console.log('Request body:', req.body);
+    console.log('Request file:', req.file);
 
+
+    const category = await Category.findById(categoryId);
+    const parentCategory = category.parentCategory 
+  ? await Category.findById(category.parentCategory) 
+  : { _id: "" };
+    if (!category) { 
+      return res.status(400).json({ error: 'Category invalide' });
+    }
+    
+  
   const thing = new Thing({
     ...thingObject,
     userId: req.auth.userId,
     imageUrl,
+    category: category._id,
+    parentCategory: parentCategory._id 
+
   });
   
   await thing.save()
       .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
       .catch(error => res.status(400).json({ error : error.message}));
-      };
+};
 
 
-
+    
 
       exports.modifyThing = async (req, res, next) => {
         try {
@@ -76,39 +93,41 @@ exports.createThing = async (req, res, next) => {
         }
     };
 
-exports.deleteThing = async (req, res, next) => {
-  const thing = await Thing.findOne({ _id: req.params.id });
-  if (thing.userId != req.auth.userId) {
-    return res.status(401).json({ error: 'Not authorized' }); 
-  }
-  
-  // Supprimer l'image sur Cloudinary
-  await cloudinary.uploader.destroy(thing.imageUrl); 
-  
-  await Thing.deleteOne({ _id: req.params.id });
-  res.status(200).json({ message: 'Objet supprimé !' });
-}
-exports.getOneThing =  (req, res, next) => {
-  Thing.findOne({ _id: req.params.id }).populate('category')
-    .then(thing => {
-      if (thing.subcategory) {
-        thing.populate('subcategory', (err, thing) => {
-          if (err) {
-            res.status(404).json({ error: err });
-          } else {
-            res.status(200).json(thing); 
-          }
-        });
-      } else {
-        delete thing.subcategory;
-        res.status(200).json(thing);
-      }
+    exports.deleteThing = async (req, res, next) => {
+      const thing = await Thing.findOne({ _id: req.params.id });
+    
+      // Supprimer l'image sur Cloudinary
+      await cloudinary.uploader.destroy(thing.imageUrl);
+    
+      // Supprimer l'objet
+      await Thing.deleteOne({ _id: req.params.id });
+      res.status(200).json({ message: 'Objet supprimé !' });
+    }
+    exports.getOneThing = (req, res, next) => {
+      Thing.findOne({ _id: req.params.id })
+      .populate({
+      path: 'category',
+      populate: {
+      path: 'parentCategory',
+      model: 'Category',
+      },
+      })
+      .then((thing) => {
+      res.status(200).json(thing);
+      })
+      .catch((error) => res.status(404).json({ error }));
+      };
+
+exports.getThings = (req, res, next) => {
+  Thing.find()
+    .populate({
+      path: 'category',
+      populate: {
+        path: 'parentCategory',
+        model: 'Category',
+      },
     })
-    .catch(error => res.status(404).json({ error })); 
+    .then((things) => res.status(200).json(things))
+    .catch((error) => res.status(400).json({ error }));
 };
-  exports.getThings =  (req, res, next) => {
-    Thing.find().populate('category')
-      .then(things => res.status(200).json(things))
-      .catch(error => res.status(400).json({ error }));
-  };
 
