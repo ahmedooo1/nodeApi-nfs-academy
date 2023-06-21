@@ -104,7 +104,7 @@ router.get('/comments/:id', auth, commentController.getComment);
  *       403:
  *         description: Accès refusé
  */
-router.put('/comments/:id', auth, roleCheck('admin'), commentController.updateComment);
+router.put('/comments/:id', auth, commentController.updateComment);
 
 /**
  * @swagger
@@ -131,6 +131,6 @@ router.put('/comments/:id', auth, roleCheck('admin'), commentController.updateCo
  *       403:
  *         description: Accès refusé
  */
-router.delete('/comments/:id',auth, roleCheck('admin'), commentController.deleteComment);
+router.delete('/comments/:id',auth, commentController.deleteComment);
 
 module.exports = router;

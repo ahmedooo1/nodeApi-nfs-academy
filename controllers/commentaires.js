@@ -34,8 +34,20 @@ exports.createComment = async (req, res) => {
 
 exports.getComments = async (req, res) => {
   try {
-    const comments = await Comment.find().populate('user', 'name').populate('userId', 'name');    
-    
+    // Récupérez le paramètre stuffId à partir de req.query
+    const { stuffId } = req.query;
+
+    // Vérifiez si stuffId est fourni
+    if (!stuffId) {
+      return res.status(400).json({
+        success: false,
+        message: "Le paramètre stuffId est manquant."
+      });
+    }
+
+    // Utilisez Comment.find() avec un objet de filtre contenant stuffId
+    const comments = await Comment.find({ stuffId }).populate('userId', 'name');
+
     res.status(200).json({
       success: true,
       data: comments
@@ -52,7 +64,7 @@ exports.getComments = async (req, res) => {
 exports.getComment = async (req, res) => {
   try {
     const commentId = req.params.id;
-    const comment = await Comment.findById(commentId).populate('user', 'name');
+    const comment = await Comment.findById(commentId).populate('userId', 'name');
 
     if (!comment) {
       return res.status(404).json({
