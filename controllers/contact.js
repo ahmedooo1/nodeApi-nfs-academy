@@ -15,13 +15,11 @@ exports.sendContactMessage = async (req, res) => {
   });
 
   const mailOptions = {
-     from:  email, // Utilisez votre adresse e-mail Outlook en tant qu'expéditeur
-    //  replyTo: email, // Ajoutez l'adresse e-mail de l'utilisateur au champ replyTo
-     to: process.env.MAILER_EMAIL,
+    from: `"${name}" <${email}>`, // Ajoutez un nom d'affichage et une adresse e-mail pour l'en-tête "From"
+    to: process.env.MAILER_EMAIL,
     subject: `${name}`,
     text: message,
   };
-
   try {
     const info = await transporter.sendMail(mailOptions);
     res.status(200).send({ message: 'Email envoyé avec succès' });
