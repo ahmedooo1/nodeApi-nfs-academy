@@ -94,3 +94,25 @@ exports.verifyPasswordResetToken = async (req, res) => {
       return res.status(500).json({ message: "Internal server error.", error: error.message });
     }
   };
+  exports.resetPasswordProfile = async (req, res) => {
+    try {
+      const { password, passwordConfirmation } = req.body;
+  
+      // Vérifier le nouveau mot de passe et sa confirmation
+      if (password !== passwordConfirmation) {
+        return res.status(400).json({ error: "Les mots de passe ne correspondent pas." });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const user = await User.findByIdAndUpdate(
+        req.params.id,
+        { password: hashedPassword },
+        { new: true }
+      );
+  
+      res.json(user);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };

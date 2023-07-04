@@ -228,6 +228,7 @@ router.get("/reset/:token", resetmdp.verifyPasswordResetToken);
  */
 router.post("/reset/:token", resetmdp.updatePassword);
 
+router.put("/reset/:id",auth, resetmdp.resetPasswordProfile);
 
 router.post('/search', userCtrl.searchUsers);
 module.exports = router;
