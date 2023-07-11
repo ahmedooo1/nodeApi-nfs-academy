@@ -22,9 +22,9 @@ exports.sendResetPasswordEmail = async (req, res) => {
     await user.save();
 
 
-    const mailOptions = {
+    const mailOptions = {  
+       from: process.env.MAILER_EMAIL, 
       to: user.email,
-      from: process.env.MAILER_EMAIL, 
       subject: "Réinitialisation du mot de passe",
       text: `Vous avez demandé la réinitialisation du mot de passe de votre compte.\n\n
              Veuillez cliquer sur le lien suivant, ou copiez-le et collez-le dans votre navigateur pour compléter le processus de réinitialisation du mot de passe :\n\n
