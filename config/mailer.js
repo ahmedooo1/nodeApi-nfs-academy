@@ -1,12 +1,15 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: "Outlook365",
-  port: 587, // or 465, or another port depending on your email provider
-  secure: false, // true for 465, false for other ports
+  host: "smtp.office365.com", // Utilisez le bon nom d'hôte pour Outlook 365
+  port: 587,
+  secure: false, // false pour le port 587, true pour le port 465
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    ciphers: "SSLv3",
   },
 });
 
