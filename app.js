@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGODB_URI,
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
   const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200, 
