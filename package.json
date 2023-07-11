@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "dev": "nodemon server.js",
     "install": "npm ci || npm install",
     "build": "echo 'No build step is necessary'"
   },
