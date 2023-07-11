@@ -21,14 +21,7 @@ mongoose.connect(process.env.MONGODB_URI,
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-  const corsOptions = {
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    optionsSuccessStatus: 200, 
-  };
-  
-  app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
