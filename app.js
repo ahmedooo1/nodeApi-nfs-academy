@@ -15,6 +15,8 @@ const contactRoutes = require('./routes/contactRoutes');
 const cors = require('cors')
 const cron = require("node-cron");
 const backupDatabase = require("./config/backup");
+const rateLimit = require('express-rate-limit');
+
 mongoose.connect(process.env.MONGODB_URI,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -41,4 +43,14 @@ cron.schedule("00 00 * * *", () => {
   backupDatabase();
 });
 
+
+// Limite de 100 requêtes par heure pour une même adresse IP
+const limiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 heure
+  max: 200,
+  message: 'Trop de requêtes ont été effectuées depuis cette adresse IP. Veuillez réessayer plus tard.'
+});
+
+// Appliquez le middleware de limite de taux à toutes les routes
+app.use(limiter);
 module.exports = app;
