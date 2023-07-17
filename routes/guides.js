@@ -131,7 +131,7 @@ router.delete('/:id', auth,roleCheck(['admin', 'redacteur']), guidesCtrl.deleteT
  */
 router.get('/', guidesCtrl.getThings);
 // POST /api/v1/guides/:id/report - Signaler un guide
-router.post('/:id/report', auth, guidesCtrl.reportGuide);
+router.post('/:id/report',  guidesCtrl.reportGuide);
 
 
 module.exports = router;
