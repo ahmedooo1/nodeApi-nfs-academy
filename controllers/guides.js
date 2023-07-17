@@ -4,6 +4,8 @@ const uploadImage = require('../utils/uploadImage');
 const cloudinary = require('../config/cloudinary-config');
 const Category = require('../models/categorie');
 const Subcategory = require('../models/Subcategory');
+const transporter = require('../config/mailer')
+
 exports.createThing = async (req, res, next) => {
     const thingObject = req.body;
     const categoryId = req.body.category;
@@ -131,3 +133,42 @@ exports.getThings = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
+
+exports.reportGuide = async (req, res, next) => {
+  try {
+    const guide = await Thing.findOne({ _id: req.params.id });
+
+    if (!guide) {
+      return res.status(404).json({ error: "Le guide n'existe pas" });
+    }
+
+    // Vous pouvez ajouter ici une logique pour gérer le signalement et le stocker dans la base de données,
+    // par exemple en ajoutant le signalement à un champ "reports" dans le modèle Guide.
+
+    // Ensuite, vous pouvez envoyer un e-mail aux administrateurs pour les informer du signalement
+    const admins = [process.env.MAILER_ADMIN]; // Remplacez cela par les adresses e-mail de vos administrateurs
+
+    const mailOptions = {
+      from: process.env.MAILER_EMAIL, // Remplacez cela par votre adresse e-mail
+      to: admins.join(","),
+      subject: "Guide Signalé",
+      text: `Le guide "${guide.title}" a été signalé par un utilisateur. Veuillez vérifier le guide et prendre les mesures nécessaires.`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        // Gérer les erreurs d'envoi de l'e-mail
+        return res.status(500).json({ error: "Erreur lors de l'envoi de l'e-mail de signalement." });
+      } else {
+        console.log("E-mail de signalement envoyé : " + info.response);
+        // Envoyer une réponse de succès à l'utilisateur
+        res.status(200).json({ message: "Guide signalé avec succès !" });
+      }
+    });
+  } catch (error) {
+    // Gérer les erreurs ici et renvoyer une réponse avec le code d'erreur approprié
+    console.error(error);
+    res.status(500).json({ error: "Erreur lors du signalement du guide." });
+  }
+};

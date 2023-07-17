@@ -130,5 +130,8 @@ router.delete('/:id', auth,roleCheck(['admin', 'redacteur']), guidesCtrl.deleteT
  *         description: Une liste d'objets
  */
 router.get('/', guidesCtrl.getThings);
+// POST /api/v1/guides/:id/report - Signaler un guide
+router.post('/:id/report', auth, guidesCtrl.reportGuide);
+
 
 module.exports = router;
