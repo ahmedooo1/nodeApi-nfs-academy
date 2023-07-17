@@ -1,12 +1,13 @@
-const crypto = require("crypto")
-const User = require("../models/utilisateur");
-const transporter = require("../config/mailer");
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 const jwt = require("jsonwebtoken");
-const bcrypt = require('bcrypt');
+const User = require("../models/utilisateur");
 require('dotenv').config();
 
+// Configurez votre clé API Sendinblue ici
+SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = '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';
+
 exports.sendResetPasswordEmail = async (req, res) => {
-    try{
+  try {
     const { email } = req.body;
     const user = await User.findOne({ email });
 
@@ -14,6 +15,7 @@ exports.sendResetPasswordEmail = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Utilisateur introuvable." });
     }
+    
     // Générer un jeton JWT avec l'ID utilisateur et une durée de validité d'une heure
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
@@ -21,25 +23,29 @@ exports.sendResetPasswordEmail = async (req, res) => {
     user.resetToken = token;
     await user.save();
 
+    const api = new SibApiV3Sdk.TransactionalEmailsApi();
 
-    const mailOptions = {  
-       from: process.env.MAILER_EMAIL, 
-      to: user.email,
+    const mailOptions = {
+      sender: { email: process.env.MAILER_EMAIL, name: "Votre nom d'affichage" }, // Remplacez "Votre nom d'affichage" par le nom que vous souhaitez afficher dans l'e-mail
+      to: [{ email: user.email }],
       subject: "Réinitialisation du mot de passe",
       text: `Vous avez demandé la réinitialisation du mot de passe de votre compte.\n\n
              Veuillez cliquer sur le lien suivant, ou copiez-le et collez-le dans votre navigateur pour compléter le processus de réinitialisation du mot de passe :\n\n
              http://${req.headers.host}/api/v1/auth/reset/${token}\n\n
              Si vous n'avez pas demandé de réinitialisation du mot de passe, veuillez ignorer cet e-mail et votre mot de passe restera inchangé.\n`,
+      htmlContent: `<p>Vous avez demandé la réinitialisation du mot de passe de votre compte.</p>
+                   <p>Veuillez cliquer sur le lien suivant, ou copiez-le et collez-le dans votre navigateur pour compléter le processus de réinitialisation du mot de passe :</p>
+                   <p><a href="http://${req.headers.host}/api/v1/auth/reset/${token}">Lien de réinitialisation</a></p>
+                   <p>Si vous n'avez pas demandé de réinitialisation du mot de passe, veuillez ignorer cet e-mail et votre mot de passe restera inchangé.</p>`,
     };
 
-    await transporter.sendMail(mailOptions);
+    await api.sendTransacEmail(mailOptions);
     res.status(200).json({ message: "E-mail de réinitialisation envoyé" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de l'envoi de l'e-mail de réinitialisation",error: error.message });
+    res.status(500).json({ message: "Erreur lors de l'envoi de l'e-mail de réinitialisation", error: error.message });
   }
 };
-
 exports.verifyPasswordResetToken = async (req, res) => {
     try {
       const { token } = req.params;

@@ -1,31 +1,28 @@
-const nodemailer = require('nodemailer');
-require('dotenv').config();
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 exports.sendContactMessage = async (req, res) => {
   const { name, email, message } = req.body;
 
-  const transporter = nodemailer.createTransport({
-  host: 'smtp-relay.sendinblue.com', 
-  port: 587, 
-  secure: false, // true pour 465, false pour d'autres ports 
-  auth: {
-      user: process.env.MAILER_EMAIL,
-      pass: process.env.MAILER_SECRET_BREVO,
-    },
-  });
+  // Configurez votre clé API Sendinblue
+  SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = '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';
+
+  const api = new SibApiV3Sdk.TransactionalEmailsApi();
 
   const mailOptions = {
-    from: `"${name}" <${email}>`, // Ajoutez un nom d'affichage et une adresse e-mail pour l'en-tête "From"
-    to: process.env.MAILER_EMAIL,
-    subject: `${name}`,
-    text: message,
+    sender: { email: email, name: name },
+    subject: name,
+    htmlContent: message,
+    // Mettez l'adresse e-mail du destinataire ici
+    to: [{ email: process.env.MAILER_EMAIL }],
   };
+
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const data = await api.sendTransacEmail(mailOptions);
+    console.log(data);
     res.status(200).send({ message: 'Email envoyé avec succès' });
   } catch (error) {
     console.error('Erreur lors de l\'envoi de l\'email :', error); // Affiche l'erreur dans la console
 
-    res.status(500).send({ message: "Erreur lors de l'envoi de l'email" ,error: error.message});
+    res.status(500).send({ message: "Erreur lors de l'envoi de l'email", error: error.message });
   }
 };
