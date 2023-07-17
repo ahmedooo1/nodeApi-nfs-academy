@@ -4,7 +4,7 @@ exports.sendContactMessage = async (req, res) => {
   const { name, email, message } = req.body;
 
   // Configurez votre clé API Sendinblue
-  SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = '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';
+  SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
 
   const api = new SibApiV3Sdk.TransactionalEmailsApi();
 

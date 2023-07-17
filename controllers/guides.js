@@ -5,6 +5,7 @@ const cloudinary = require('../config/cloudinary-config');
 const Category = require('../models/categorie');
 const Subcategory = require('../models/Subcategory');
 const transporter = require('../config/mailer')
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
 exports.createThing = async (req, res, next) => {
     const thingObject = req.body;
@@ -148,24 +149,31 @@ exports.reportGuide = async (req, res, next) => {
     // Ensuite, vous pouvez envoyer un e-mail aux administrateurs pour les informer du signalement
     const admins = [process.env.MAILER_ADMIN]; // Remplacez cela par les adresses e-mail de vos administrateurs
 
+    // Configurez votre clé API Sendinblue
+    SibApiV3Sdk.ApiClient.instance.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+
+    const api = new SibApiV3Sdk.TransactionalEmailsApi();
+
     const mailOptions = {
-      from: process.env.MAILER_EMAIL, // Remplacez cela par votre adresse e-mail
-      to: admins.join(","),
+      sender: { email: process.env.MAILER_EMAIL, name:"NFS Academy" }, // Remplacez cela par votre adresse e-mail
+      to: admins.map(email => ({ email })),
       subject: "Guide Signalé",
       text: `Le guide "${guide.title}" a été signalé par un utilisateur. Veuillez vérifier le guide et prendre les mesures nécessaires.`,
+      htmlContent: `<p>Le guide "${guide.title}" a été signalé par un utilisateur.</p><p>Veuillez vérifier le guide et prendre les mesures nécessaires.</p>`,
+
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error);
-        // Gérer les erreurs d'envoi de l'e-mail
-        return res.status(500).json({ error: "Erreur lors de l'envoi de l'e-mail de signalement." });
-      } else {
-        console.log("E-mail de signalement envoyé : " + info.response);
-        // Envoyer une réponse de succès à l'utilisateur
-        res.status(200).json({ message: "Guide signalé avec succès !" });
-      }
-    });
+    try {
+      const data = await api.sendTransacEmail(mailOptions);
+      console.log(data);
+      // Envoyer une réponse de succès à l'utilisateur
+      res.status(200).json({ message: "Guide signalé avec succès !" });
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de l\'e-mail de signalement :', error); // Affiche l'erreur dans la console
+
+      // Gérer les erreurs d'envoi de l'e-mail
+      res.status(500).json({ error: "Erreur lors de l'envoi de l'e-mail de signalement." });
+    }
   } catch (error) {
     // Gérer les erreurs ici et renvoyer une réponse avec le code d'erreur approprié
     console.error(error);
