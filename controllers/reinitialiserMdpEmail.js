@@ -26,7 +26,7 @@ exports.sendResetPasswordEmail = async (req, res) => {
     const api = new SibApiV3Sdk.TransactionalEmailsApi();
 
     const mailOptions = {
-      sender: { email: process.env.MAILER_EMAIL, name: "Votre nom d'affichage" }, // Remplacez "Votre nom d'affichage" par le nom que vous souhaitez afficher dans l'e-mail
+      sender: { email: process.env.MAILER_EMAIL, name: "NFS Academy" }, // Remplacez "Votre nom d'affichage" par le nom que vous souhaitez afficher dans l'e-mail
       to: [{ email: user.email }],
       subject: "Réinitialisation du mot de passe",
       text: `Vous avez demandé la réinitialisation du mot de passe de votre compte.\n\n
