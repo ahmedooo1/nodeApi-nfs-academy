@@ -1,9 +1,9 @@
-name: Deploy API
+name: Deploy apiNfsAcademy
 
 on:
   push:
     branches:
-      - main  # Change cela si tu utilises une autre branche
+      - main  
 
 jobs:
   deploy:
@@ -16,13 +16,13 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'  # Spécifie la version de Node.js que tu utilises
+        node-version: '18' 
 
     - name: Install dependencies
       run: npm install
 
     - name: Run build (si nécessaire)
-      run: npm run build  # Ajuste cette ligne selon ton script de build
+      run: npm run build  
 
     - name: Deploy to Server via SSH
       uses: appleboy/scp-action@master
@@ -32,4 +32,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         source: "."
-        target: "/var/www/apiNfsAcademy"  # Chemin cible sur ton VPS
+        target: "/var/www/nodeApi-nfs-academy"  
+
+    - name: Start application
+      run: pm2 start /var/www/nodeApi-nfs-academy/server.js --name "nodeApi-nfs-academy" --watch
