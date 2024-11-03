@@ -1,0 +1,35 @@
+name: Deploy API
+
+on:
+  push:
+    branches:
+      - main  # Change cela si tu utilises une autre branche
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'  # Spécifie la version de Node.js que tu utilises
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run build (si nécessaire)
+      run: npm run build  # Ajuste cette ligne selon ton script de build
+
+    - name: Deploy to Server via SSH
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        source: "."
+        target: "/var/www/apiNfsAcademy"  # Chemin cible sur ton VPS
