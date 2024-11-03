@@ -30,7 +30,7 @@ const swaggerOptions = {
     ],
     servers: [
       {
-        url: 'http://apinfsacademy.aa-world.store/api/v1', 
+        url: 'http://apinfsacademy.aa-world.store/api/v1',
       },
     ],
   },
