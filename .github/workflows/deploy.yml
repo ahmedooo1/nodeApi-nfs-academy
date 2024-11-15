@@ -3,7 +3,7 @@ name: Deploy API
 on:
   push:
     branches:
-      - master  # Déclenche le workflow lors des push sur la branche main
+      - master  # Déclenche le workflow lors des push sur la branche master
 
 jobs:
   deploy:
@@ -21,11 +21,12 @@ jobs:
     - name: Install Dependencies
       run: npm install  
 
-  #  - name: Build
- #     run: npm run build  
+    # Uncomment the following steps if needed
+    # - name: Build
+    #   run: npm run build  
 
- #   - name: Generate Static Files
- #     run: npm run generate  
+    # - name: Generate Static Files
+    #   run: npm run generate  
 
     - name: Deploy to Server
       uses: appleboy/ssh-action@master
@@ -36,7 +37,7 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         script: |
           cd /var/www/nodeApi-nfs-academy  
-          git pull origin main  
+          git pull origin master  # Assurez-vous que c'est la bonne branche
           npm install --production  
           npm run dev  
           pm2 start /var/www/nodeApi-nfs-academy/server.js --name "nodeApi-nfs-academy" --watch
