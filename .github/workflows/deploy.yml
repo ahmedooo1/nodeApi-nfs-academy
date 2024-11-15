@@ -38,5 +38,5 @@ jobs:
           cd /var/www/nodeApi-nfs-academy  
           git pull origin main  
           npm install --production  
-          npm run generate  
+          npm run dev  
           pm2 start /var/www/nodeApi-nfs-academy/server.js --name "nodeApi-nfs-academy" --watch
