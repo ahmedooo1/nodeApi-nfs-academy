@@ -39,5 +39,4 @@ jobs:
           cd /var/www/nodeApi-nfs-academy  
           git pull origin master  # Assurez-vous que c'est la bonne branche
           npm install --production  
-          npm run dev  
-          pm2 start /var/www/nodeApi-nfs-academy/server.js --name "nodeApi-nfs-academy" --watch
+          pm2 restart "nodeApi-nfs-academy" --watch
