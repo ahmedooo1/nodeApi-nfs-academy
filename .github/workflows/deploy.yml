@@ -3,7 +3,7 @@ name: Deploy API
 on:
   push:
     branches:
-      - master  # Déclenche le workflow lors des push sur la branche master
+      - main  # Déclenche le workflow lors des push sur la branche main
 
 jobs:
   deploy:
@@ -21,25 +21,27 @@ jobs:
     - name: Install Dependencies
       run: npm install  
 
-    # Uncomment the following steps if needed
-    # - name: Build
-    #   run: npm run build  
+    - name: Build
+      run: npm run build  # Assurez-vous que ce script existe dans package.json
 
-    # - name: Generate Static Files
-    #   run: npm run generate  
+    - name: Generate Static Files
+      run: npm run generate  # Vérifiez également si ce script est dans package.json
 
     - name: Deploy to Server
       uses: appleboy/ssh-action@master
       with:
-              host: ${{ secrets.SSH_HOST }}
-              username: ${{ secrets.SSH_USERNAME }}
-              key: ${{ secrets.SSH_KEY }}
-              port: ${{ secrets.SSH_PORT }}
-              script: |
-                cd /var/www/nodeApi-nfs-academy  
-                git pull origin main  
-                npm install --production  
-                npm run build 
-                npm run generate  
-                pm2 start /var/www/nodeApi-nfs-academy/server.js --name "nodeApi-nfs-academy" --watch
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          cd /var/www/nodeApi-nfs-academy  
+          git pull origin main  
+          npm install --production  
+          npm run build  # Assurez-vous que cela existe
+          npm run generate  # Vérifiez également
+          pm2 start /var/www/nodeApi-nfs-academy/server.js --name "nodeApi-nfs-academy" --watch
 
+    # Optionnel: Débogage
+    - name: Check Secrets
+      run: echo "SSH_HOST:" ${{ secrets.SSH_HOST }}
