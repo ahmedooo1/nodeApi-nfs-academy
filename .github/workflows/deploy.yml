@@ -3,7 +3,7 @@ name: Deploy API
 on:
   push:
     branches:
-      - main  # Déclenche le workflow lors des push sur la branche main
+      - master  # Déclenche le workflow lors des push sur la branche main
 
 jobs:
   deploy:
